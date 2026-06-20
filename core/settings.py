@@ -1,4 +1,6 @@
 import os
+
+import dj_database_url
 from decouple import config
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -7,18 +9,30 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG')
 
-if DEBUG:
+IS_LOCAL_DEVELOPMENT = config('IS_LOCAL_DEVELOPMENT')
+
+if IS_LOCAL_DEVELOPMENT:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['.tortoisecommunity.org']
 
+
 CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOWED_ORIGINS = [
     "https://tortoisecommunity.org",
     "https://www.tortoisecommunity.org",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "https://api.tortoisecommunity.org",
+    "https://execute.tortoisecommunity.org",
+    "https://studio.tortoisecommunity.org",
 ]
+if IS_LOCAL_DEVELOPMENT:
+    CORS_ALLOWED_ORIGINS.extend(
+        ['http://localhost:3000',
+         r"^http://([a-z0-9-]+\.)?localhost\.co:3000",
+         "http://127.0.0.1:3000"
+         ]
+    )
 
 DATE_INPUT_FORMATS = ['%Y-%m-%d']
 
@@ -77,17 +91,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': '5432'
-    }
-}
 
+DATABASES = {
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    ),
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -172,10 +182,8 @@ HASH_ITERATION = config('HASH_ITERATION')
 SERVER_ID = config('SERVER_ID')
 WEBHOOK_ID = config('WEBHOOK_ID')
 WEBHOOK_SECRET = config('WEBHOOK_SECRET')
-BOT_SOCKET_IP = config('BOT_SOCKET_IP')
-BOT_SOCKET_PORT = config('BOT_SOCKET_PORT')
-BOT_SOCKET_TOKEN = config('BOT_SOCKET_TOKEN')
+
 OAUTH_CLIENT_ID = config('OAUTH_CLIENT_ID')
 OAUTH_CLIENT_SECRET = config('OAUTH_CLIENT_SECRET')
+
 GITHUB_ACCESS_TOKEN = config('GITHUB_ACCESS_TOKEN')
-DELETION_CONFIRMATION_KEY = config('DELETION_CONFIRMATION_KEY')
