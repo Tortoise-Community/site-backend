@@ -6,7 +6,7 @@ class Oauth(object):
     client_id = settings.OAUTH_CLIENT_ID
     client_secret = settings.OAUTH_CLIENT_SECRET
     scope = "identify%20email"
-    redirect_uri = "https://www.tortoisecommunity.org/verification/handlers/"
+    redirect_uri = "http://dashboard.localhost.co:8000/login/"
     discord_login_url = "https://discord.com/api/oauth2/authorize?client_id={}&" \
                         "redirect_uri={}&response_type=code&scope={}".format(client_id, redirect_uri, scope)
     discord_token_url = "https://discord.com/api/oauth2/token"
@@ -14,7 +14,7 @@ class Oauth(object):
     client_id = settings.OAUTH_CLIENT_ID
 
     def __init__(self,
-                 redirect_uri="https://www.tortoisecommunity.com/verification/handlers/",
+                 redirect_uri="http://dashboard.localhost.co:8000/login/",
                  scope="identify%20email"
                  ):
         self.redirect_uri = redirect_uri
@@ -24,7 +24,7 @@ class Oauth(object):
             f"&redirect_uri={self.redirect_uri}&response_type=code&scope={self.scope}"
         )
 
-    def get_access_token(self, code):
+    def get_token_json(self, code):
         payload = {
             'client_id': self.client_id,
             'client_secret': self.client_secret,
@@ -36,9 +36,8 @@ class Oauth(object):
 
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-        access_token = httpx.post(url=self.discord_token_url, data=payload, headers=headers)
-        json = access_token.json()
-        return json.get("access_token")
+        tokens = httpx.post(url=self.discord_token_url, data=payload, headers=headers)
+        return tokens.json()
 
     @staticmethod
     def get(access_token, endpoint):

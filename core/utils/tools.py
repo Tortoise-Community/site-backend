@@ -19,8 +19,3 @@ def reload_rules(_sender, **_kwargs):
 
 def reload_server_utils(_sender, **_kwargs):
     bot_socket.signal("server_meta")
-
-
-post_save.connect(reload_rules, sender=Rule, dispatch_uid="rules")
-post_delete.connect(reload_rules, sender=Rule, dispatch_uid="rule")
-# post_save.connect(reload_server_utils, sender=ServerUtils, dispatch_uid="server")

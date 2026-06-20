@@ -1,4 +1,4 @@
-from tortoise_api.models import Guild
+from core.apps.common.models import Guild
 from .mixins import ResponseMixin as Res
 
 

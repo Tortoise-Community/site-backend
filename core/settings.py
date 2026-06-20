@@ -19,20 +19,17 @@ else:
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "https://tortoisecommunity.org",
-    "https://www.tortoisecommunity.org",
-    "https://api.tortoisecommunity.org",
-    "https://execute.tortoisecommunity.org",
-    "https://studio.tortoisecommunity.org",
-]
+
 if IS_LOCAL_DEVELOPMENT:
-    CORS_ALLOWED_ORIGINS.extend(
-        ['http://localhost:3000',
-         r"^http://([a-z0-9-]+\.)?localhost\.co:3000",
-         "http://127.0.0.1:3000"
-         ]
-    )
+    CORS_ALLOWED_ORIGINS = ['https://localhost:3000']
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "https://tortoisecommunity.org",
+        "https://www.tortoisecommunity.org",
+        "https://api.tortoisecommunity.org",
+        "https://execute.tortoisecommunity.org",
+        "https://studio.tortoisecommunity.org",
+    ]
 
 DATE_INPUT_FORMATS = ['%Y-%m-%d']
 
@@ -47,8 +44,8 @@ INSTALLED_APPS = [
     'django_hosts',
     'rest_framework',
     'rest_framework.authtoken',
-    'core.apps.web',
-    'core.apps.ide',
+    'core.apps.oauth',
+    'core.apps.common',
     'core.apps.api'
 ]
 
@@ -66,7 +63,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 ROOT_HOSTCONF = 'core.hosts'
-DEFAULT_HOST = 'web'
+DEFAULT_HOST = 'staff'
 
 TEMPLATES = [
     {
@@ -92,11 +89,9 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 
+DATABASE_URL = config("DATABASE_URL")
 DATABASES = {
-    'default': dj_database_url.config(
-        conn_max_age=600,
-        conn_health_checks=True,
-    ),
+    'default': dj_database_url.config(default=DATABASE_URL)
 }
 
 # Password validation
@@ -116,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+AUTH_USER_MODEL = "common.User"
 
 # Django rest framework Settings
 # https://www.django-rest-framework.org/
@@ -185,5 +180,6 @@ WEBHOOK_SECRET = config('WEBHOOK_SECRET')
 
 OAUTH_CLIENT_ID = config('OAUTH_CLIENT_ID')
 OAUTH_CLIENT_SECRET = config('OAUTH_CLIENT_SECRET')
+OAUTH_REDIRECT_URI = config('OAUTH_REDIRECT_URI')
 
 GITHUB_ACCESS_TOKEN = config('GITHUB_ACCESS_TOKEN')
