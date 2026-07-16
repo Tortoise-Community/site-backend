@@ -7,8 +7,8 @@ from django.contrib.auth import settings
 
 class Hashing(object):
     def __init__(self, method="sha256",
-                 salt=settings.HASH_SALT,
-                 iterations=int(settings.HASH_ITERATION)):
+                 salt=settings.ENCRYPTION_SALT,
+                 iterations=int(settings.ENCRYPTION_ITERATION)):
         self.method = method
         self.salt = bytes(salt, 'utf-8')
         self.iterations = iterations

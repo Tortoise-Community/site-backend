@@ -165,11 +165,11 @@ MEDIA_URL = '/media/'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'tortoisecommunity@gmail.com'
-EMAIL_HOST_PASSWORD = config('EMAIL_TOKEN')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 
-HASH_SALT = config('HASH_SALT')
-HASH_ITERATION = config('HASH_ITERATION')
+ENCRYPTION_SALT = config('ENCRYPTION_SALT')
+ENCRYPTION_ITERATION = config('ENCRYPTION_ITERATION')
 
 
 # Discord configuration for bot and verification

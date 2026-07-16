@@ -1,0 +1,96 @@
+---
+- name: Deploy site-backend application
+  hosts: server1
+  become: yes
+  vars_prompt:
+    - name: ssh_email
+      prompt: "Enter email address for SSH key"
+      private: no
+
+    - name: SECRET_KEY
+      prompt: "Enter SECRET_KEY"
+      private: yes
+
+    - name: DEBUG
+      prompt: "Enter DEBUG (True/False)"
+      private: no
+
+    - name: LOCAL_DEVELOPMENT
+      prompt: "Enter LOCAL_DEVELOPMENT (True/False)"
+      private: no
+
+    - name: DATABASE_URL
+      prompt: "Enter DATABASE_URL"
+      private: yes
+
+    - name: ENCRYPTION_SALT
+      prompt: "Enter ENCRYPTION_SALT"
+      private: yes
+
+    - name: ENCRYPTION_ITERATION
+      prompt: "Enter ENCRYPTION_ITERATION"
+      private: no
+
+    - name: OAUTH_CLIENT_ID
+      prompt: "Enter OAUTH_CLIENT_ID"
+      private: no
+
+    - name: OAUTH_CLIENT_SECRET
+      prompt: "Enter OAUTH_CLIENT_SECRET"
+      private: yes
+
+    - name: OAUTH_REDIRECT_URI
+      prompt: "Enter OAUTH_REDIRECT_URI"
+      private: no
+
+
+  tasks:
+    - name: Create Dokku app site-backend
+      command: dokku apps:create site-backend
+      args:
+        creates: /home/dokku/site-backend
+
+    - name: Set environment variables in Dokku
+      command: dokku config:set site-backend
+        SECRET_KEY="{{ SECRET_KEY }}"
+        DEBUG="{{ DEBUG }}"
+        LOCAL_DEVELOPMENT="{{ LOCAL_DEVELOPMENT }}"
+        DATABASE_URL="{{ DATABASE_URL }}"
+        ENCRYPTION_SALT="{{ ENCRYPTION_SALT }}"
+        ENCRYPTION_ITERATION="{{ ENCRYPTION_ITERATION }}"
+        OAUTH_CLIENT_ID="{{ OAUTH_CLIENT_ID }}"
+        OAUTH_CLIENT_SECRET="{{ OAUTH_CLIENT_SECRET }}"
+        OAUTH_REDIRECT_URI="{{ OAUTH_REDIRECT_URI }}"
+        EMAIL_HOST_USER="test"
+        EMAIL_HOST_PASSWORD="test
+        WEBHOOK_ID="test"
+        WEBHOOK_SECRET="test"
+        SERVER_ID="test"
+        GITHUB_ACCESS_TOKEN="test"
+        DISABLE_COLLECTSTATIC=1
+
+
+    - name: Generate SSH key on the server
+      command: ssh-keygen -t rsa -b 4096 -C "{{ ssh_email }}" -f /home/ubuntu/id_rsa -N ""
+      args:
+        creates: /home/ubuntu/id_rsa
+
+    - name: Read private key from server
+      slurp:
+        src: /home/ubuntu/id_rsa
+      register: server_private_key
+
+    - name: Get app config
+      command: dokku config:show site-backend
+      register: app_config
+      changed_when: false
+
+    - name: Print app config
+      debug:
+        msg: "{{ app_config.stdout_lines }}"
+
+
+    - name: Clear configs
+      set_fact:
+        app_config: ""
+        server_private_key: ""
